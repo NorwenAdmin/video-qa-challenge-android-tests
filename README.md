@@ -20,17 +20,24 @@ A small, deterministic Android demo app that simulates a simplified media produc
 
 ## Requirements
 
-- JDK 17 or newer
+- JDK 17–24 (the bundled Gradle 8.14.2 wrapper does not run on newer JDKs)
 - Android SDK with platform 35
 - Min SDK 26 (Android 8.0), target/compile SDK 35
 - Recommended emulator: Pixel 6, API 35
 - Portrait orientation only
 
-No Android Studio installation is required to build; the Gradle wrapper is included. Gradle downloads the required SDK platform automatically, but it must be able to locate your SDK and the licenses must be accepted, otherwise the build fails with `SDK location not found`:
+No Android Studio installation is required to build; the Gradle wrapper is included. Gradle downloads the required SDK platform automatically, but two things must be in place first:
+
+1. Gradle must be able to locate your SDK, otherwise the build fails with `SDK location not found`. Point `ANDROID_HOME` at the SDK (the path below is the macOS default; adjust for your OS) or set `sdk.dir` in `local.properties`:
 
 ```bash
-export ANDROID_HOME="$HOME/Library/Android/sdk"   # or set sdk.dir in local.properties
-sdkmanager --licenses                             # accept licenses once
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+```
+
+2. The SDK licenses must be accepted, otherwise the build fails with a licence error listing the unaccepted packages. Accept them once with `sdkmanager` (part of the `cmdline-tools` SDK package — install it via Android Studio's SDK Manager or from [developer.android.com](https://developer.android.com/studio#command-line-tools-only) if missing):
+
+```bash
+"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
 ```
 
 ## Build instructions
