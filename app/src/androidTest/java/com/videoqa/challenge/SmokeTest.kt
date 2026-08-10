@@ -86,7 +86,7 @@ class SmokeTest {
         compose.onNodeWithTag("detail_title").assertTextEquals("Amsterdam from above")
         compose.onNodeWithTag("detail_category").assertTextEquals("Travel")
 
-        // Playback: Idle -> Buffering -> Playing
+        // Playback: the first observable state is Buffering, then Playing
         compose.onNodeWithTag("video_play_button").performClick()
         waitForTag("video_state_label", 5_000)
         waitForStateLabel("Playing")

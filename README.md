@@ -15,7 +15,7 @@ A small, deterministic Android demo app that simulates a simplified media produc
 | Preferences | Analytics and personalised-content toggles, saved locally. |
 | Content overview | Deterministic list of six videos with loading, empty, and error states. |
 | Content detail | Title, category, description, published date, and video preview with play button. |
-| Video player | Custom ExoPlayer UI with play/pause/resume, progress, and a testable state label (`Idle`, `Buffering`, `Playing`, `Paused`, `Error`, `Completed`). |
+| Video player | Custom ExoPlayer UI with play/pause/resume, progress, and a testable state label (`Buffering`, `Playing`, `Paused`, `Error`, `Completed`). |
 | Debug options | Gear icon on the overview. Switches content/video response modes and resets app state. |
 
 ## Requirements
