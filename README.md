@@ -69,16 +69,6 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n com.videoqa.challenge/.MainActivity
 ```
 
-### Run the bundled smoke tests (optional)
-
-The project contains a small instrumented test class (`SmokeTest`) used to verify the build. With an emulator or device connected:
-
-```bash
-./gradlew connectedDebugAndroidTest
-```
-
-Note: the connected test run uninstalls the app from the device when it finishes. Reinstall it (`adb install -r ...`) before launching the app manually again.
-
 ### Build a release APK
 
 ```bash
@@ -219,5 +209,4 @@ app/src/main/java/com/videoqa/challenge/
 └── util/                   Logging
 app/src/main/assets/content.json      Bundled content catalogue
 app/src/main/res/raw/sample_video.mp4 Bundled sample video
-app/src/androidTest/                  Build-verification smoke tests
 ```
