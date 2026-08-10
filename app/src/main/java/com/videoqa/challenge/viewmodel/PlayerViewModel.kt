@@ -1,4 +1,4 @@
-package com.dpgmedia.videoqachallenge.viewmodel
+package com.videoqa.challenge.viewmodel
 
 import android.content.Context
 import android.net.Uri
@@ -9,11 +9,11 @@ import androidx.compose.runtime.setValue
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.dpgmedia.videoqachallenge.data.PersistenceService
-import com.dpgmedia.videoqachallenge.model.ContentItem
-import com.dpgmedia.videoqachallenge.model.PlayerState
-import com.dpgmedia.videoqachallenge.model.VideoMode
-import com.dpgmedia.videoqachallenge.util.VqcLog
+import com.videoqa.challenge.data.PersistenceService
+import com.videoqa.challenge.model.ContentItem
+import com.videoqa.challenge.model.PlayerState
+import com.videoqa.challenge.model.VideoMode
+import com.videoqa.challenge.util.VqcLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

@@ -1,4 +1,4 @@
-package com.dpgmedia.videoqachallenge
+package com.videoqa.challenge
 
 import android.content.Intent
 import androidx.compose.ui.test.assertIsDisplayed

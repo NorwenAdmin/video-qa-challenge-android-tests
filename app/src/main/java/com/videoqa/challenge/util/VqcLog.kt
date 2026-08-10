@@ -1,4 +1,4 @@
-package com.dpgmedia.videoqachallenge.util
+package com.videoqa.challenge.util
 
 import android.util.Log
 

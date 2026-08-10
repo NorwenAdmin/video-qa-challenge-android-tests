@@ -1,4 +1,4 @@
-package com.dpgmedia.videoqachallenge.ui
+package com.videoqa.challenge.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

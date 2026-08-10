@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.dpgmedia.videoqachallenge"
+    namespace = "com.videoqa.challenge"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.dpgmedia.videoqachallenge"
+        applicationId = "com.videoqa.challenge"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

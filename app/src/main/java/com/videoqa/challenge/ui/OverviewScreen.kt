@@ -1,4 +1,4 @@
-package com.dpgmedia.videoqachallenge.ui
+package com.videoqa.challenge.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,9 +46,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.dpgmedia.videoqachallenge.AppContainer
-import com.dpgmedia.videoqachallenge.model.ContentItem
-import com.dpgmedia.videoqachallenge.viewmodel.ContentListViewModel
+import com.videoqa.challenge.AppContainer
+import com.videoqa.challenge.model.ContentItem
+import com.videoqa.challenge.viewmodel.ContentListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

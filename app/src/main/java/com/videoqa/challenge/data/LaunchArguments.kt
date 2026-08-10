@@ -1,14 +1,14 @@
-package com.dpgmedia.videoqachallenge.data
+package com.videoqa.challenge.data
 
 import android.os.Bundle
-import com.dpgmedia.videoqachallenge.model.ContentMode
-import com.dpgmedia.videoqachallenge.model.VideoMode
+import com.videoqa.challenge.model.ContentMode
+import com.videoqa.challenge.model.VideoMode
 
 /**
  * Test-setup configuration passed through intent extras.
  *
  * Example:
- *   adb shell am start -S -n com.dpgmedia.videoqachallenge/.MainActivity \
+ *   adb shell am start -S -n com.videoqa.challenge/.MainActivity \
  *     --ez resetAllState true --es contentMode error --ei contentDelayMs 1000
  *
  * Extras override persisted debug settings for that application run only.

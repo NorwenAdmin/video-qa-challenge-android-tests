@@ -1,8 +1,8 @@
-package com.dpgmedia.videoqachallenge.data
+package com.videoqa.challenge.data
 
-import com.dpgmedia.videoqachallenge.model.ContentMode
-import com.dpgmedia.videoqachallenge.model.VideoMode
-import com.dpgmedia.videoqachallenge.util.VqcLog
+import com.videoqa.challenge.model.ContentMode
+import com.videoqa.challenge.model.VideoMode
+import com.videoqa.challenge.util.VqcLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

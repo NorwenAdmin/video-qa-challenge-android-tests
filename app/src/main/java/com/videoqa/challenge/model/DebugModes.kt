@@ -1,4 +1,4 @@
-package com.dpgmedia.videoqachallenge.model
+package com.videoqa.challenge.model
 
 enum class ContentMode(val rawValue: String, val displayName: String, val testTag: String) {
     SUCCESS("success", "Success", "debug_content_success"),

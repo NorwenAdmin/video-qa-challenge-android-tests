@@ -1,10 +1,10 @@
-package com.dpgmedia.videoqachallenge
+package com.videoqa.challenge
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.dpgmedia.videoqachallenge.data.LaunchArguments
-import com.dpgmedia.videoqachallenge.ui.VideoQAApp
+import com.videoqa.challenge.data.LaunchArguments
+import com.videoqa.challenge.ui.VideoQAApp
 
 class MainActivity : ComponentActivity() {
 

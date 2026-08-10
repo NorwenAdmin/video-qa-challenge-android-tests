@@ -1,12 +1,12 @@
-package com.dpgmedia.videoqachallenge.viewmodel
+package com.videoqa.challenge.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.dpgmedia.videoqachallenge.data.ContentRepository
-import com.dpgmedia.videoqachallenge.model.ContentItem
-import com.dpgmedia.videoqachallenge.model.ContentMode
-import com.dpgmedia.videoqachallenge.util.VqcLog
+import com.videoqa.challenge.data.ContentRepository
+import com.videoqa.challenge.model.ContentItem
+import com.videoqa.challenge.model.ContentMode
+import com.videoqa.challenge.util.VqcLog
 import kotlinx.coroutines.CancellationException
 
 class ContentListViewModel(private val repository: ContentRepository) {

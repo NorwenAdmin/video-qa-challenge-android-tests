@@ -1,4 +1,4 @@
-package com.dpgmedia.videoqachallenge.model
+package com.videoqa.challenge.model
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

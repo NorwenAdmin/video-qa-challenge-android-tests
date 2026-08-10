@@ -1,10 +1,10 @@
-package com.dpgmedia.videoqachallenge.data
+package com.videoqa.challenge.data
 
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.dpgmedia.videoqachallenge.model.ContentMode
-import com.dpgmedia.videoqachallenge.model.VideoMode
+import com.videoqa.challenge.model.ContentMode
+import com.videoqa.challenge.model.VideoMode
 
 /** Thin wrapper around SharedPreferences so every persisted key lives in one place. */
 class PersistenceService(context: Context) {

@@ -1,4 +1,4 @@
-package com.dpgmedia.videoqachallenge.ui
+package com.videoqa.challenge.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -35,10 +35,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.ui.PlayerView
-import com.dpgmedia.videoqachallenge.AppContainer
-import com.dpgmedia.videoqachallenge.model.ContentItem
-import com.dpgmedia.videoqachallenge.model.PlayerState
-import com.dpgmedia.videoqachallenge.viewmodel.PlayerViewModel
+import com.videoqa.challenge.AppContainer
+import com.videoqa.challenge.model.ContentItem
+import com.videoqa.challenge.model.PlayerState
+import com.videoqa.challenge.viewmodel.PlayerViewModel
 
 @Composable
 fun PlayerSection(container: AppContainer, item: ContentItem) {

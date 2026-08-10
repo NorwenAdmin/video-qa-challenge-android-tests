@@ -3,7 +3,7 @@
 The Android twin of the iOS Video QA Challenge app: a small, deterministic demo app used as the technical assignment for Senior Mobile Test Automation Engineer candidates. It simulates a simplified media product with a consent screen, a video content overview, content detail pages, and a video player with an explicit, inspectable state machine.
 
 - App name: **Video QA Challenge**
-- Application id: `com.dpgmedia.videoqachallenge`
+- Application id: `com.videoqa.challenge`
 - No login, no network, no external services. All content and video are bundled.
 - Kotlin, Jetpack Compose, Media3 (ExoPlayer).
 
@@ -59,7 +59,7 @@ A ready-to-use debug APK is committed at `bin/VideoQAChallenge-debug.apk`. You d
 
 ```bash
 adb install -r bin/VideoQAChallenge-debug.apk
-adb shell am start -n com.dpgmedia.videoqachallenge/.MainActivity
+adb shell am start -n com.videoqa.challenge/.MainActivity
 ```
 
 The same APK can be used directly as the `app` capability for Appium or uploaded to a device cloud.
@@ -76,7 +76,7 @@ Output: `app/build/outputs/apk/debug/app-debug.apk`
 
 ```bash
 adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb shell am start -n com.dpgmedia.videoqachallenge/.MainActivity
+adb shell am start -n com.videoqa.challenge/.MainActivity
 ```
 
 ### Run the bundled smoke tests (optional)
@@ -139,7 +139,7 @@ Debug options → `Reset consent`, `Clear playback progress`, `Restore default s
 Extras override persisted debug settings for that run only (they are not written back to storage). Use `-S` to force-stop the app first so the extras apply to a fresh process:
 
 ```bash
-adb shell am start -S -n com.dpgmedia.videoqachallenge/.MainActivity \
+adb shell am start -S -n com.videoqa.challenge/.MainActivity \
   --ez resetAllState true          # clear all persisted state
   --ez resetConsent true           # clear only the consent selection
   --es contentMode success|empty|error|slow
@@ -157,8 +157,8 @@ With Appium (UiAutomator2 driver):
 ### Removing app data
 
 ```bash
-adb shell pm clear com.dpgmedia.videoqachallenge   # clear app data (consent shows again)
-adb uninstall com.dpgmedia.videoqachallenge        # remove the app
+adb shell pm clear com.videoqa.challenge   # clear app data (consent shows again)
+adb uninstall com.videoqa.challenge        # remove the app
 ```
 
 ## Logging
@@ -194,7 +194,7 @@ Use the returned `app_url` (`bs://...`) as the `appium:app` capability. The app 
 
 ```text
 bin/                                  Prebuilt example debug APK
-app/src/main/java/com/dpgmedia/videoqachallenge/
+app/src/main/java/com/videoqa/challenge/
 ├── MainActivity.kt         Entry point, reads intent extras
 ├── AppContainer.kt         Root state and shared services
 ├── model/                  Content item, player state, debug mode enums

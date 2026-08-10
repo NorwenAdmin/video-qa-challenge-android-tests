@@ -1,4 +1,4 @@
-package com.dpgmedia.videoqachallenge.ui
+package com.videoqa.challenge.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import com.dpgmedia.videoqachallenge.AppContainer
-import com.dpgmedia.videoqachallenge.viewmodel.ContentListViewModel
+import com.videoqa.challenge.AppContainer
+import com.videoqa.challenge.viewmodel.ContentListViewModel
 
 sealed interface MainScreen {
     data object Overview : MainScreen
@@ -61,7 +61,7 @@ private fun ConsentFlow(container: AppContainer) {
             onBack = { showPreferences = false },
             onSave = { analytics, personalisation ->
                 container.selectConsent(
-                    com.dpgmedia.videoqachallenge.ConsentChoice.CUSTOM,
+                    com.videoqa.challenge.ConsentChoice.CUSTOM,
                     analytics = analytics,
                     personalisation = personalisation,
                 )
@@ -70,10 +70,10 @@ private fun ConsentFlow(container: AppContainer) {
     } else {
         ConsentScreen(
             onAcceptAll = {
-                container.selectConsent(com.dpgmedia.videoqachallenge.ConsentChoice.ACCEPTED_ALL)
+                container.selectConsent(com.videoqa.challenge.ConsentChoice.ACCEPTED_ALL)
             },
             onRejectOptional = {
-                container.selectConsent(com.dpgmedia.videoqachallenge.ConsentChoice.REJECTED_OPTIONAL)
+                container.selectConsent(com.videoqa.challenge.ConsentChoice.REJECTED_OPTIONAL)
             },
             onManagePreferences = { showPreferences = true },
         )

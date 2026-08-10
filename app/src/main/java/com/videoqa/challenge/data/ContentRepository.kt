@@ -1,8 +1,8 @@
-package com.dpgmedia.videoqachallenge.data
+package com.videoqa.challenge.data
 
 import android.content.Context
-import com.dpgmedia.videoqachallenge.model.ContentItem
-import com.dpgmedia.videoqachallenge.model.ContentMode
+import com.videoqa.challenge.model.ContentItem
+import com.videoqa.challenge.model.ContentMode
 import kotlinx.coroutines.delay
 import org.json.JSONArray
 import kotlin.random.Random

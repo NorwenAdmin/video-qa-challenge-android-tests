@@ -1,4 +1,4 @@
-package com.dpgmedia.videoqachallenge.model
+package com.videoqa.challenge.model
 
 enum class PlayerState(val label: String) {
     IDLE("Idle"),

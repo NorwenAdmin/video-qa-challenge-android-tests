@@ -1,11 +1,11 @@
-package com.dpgmedia.videoqachallenge
+package com.videoqa.challenge
 
 import android.content.Context
-import com.dpgmedia.videoqachallenge.data.ContentRepository
-import com.dpgmedia.videoqachallenge.data.DebugConfiguration
-import com.dpgmedia.videoqachallenge.data.LaunchArguments
-import com.dpgmedia.videoqachallenge.data.PersistenceService
-import com.dpgmedia.videoqachallenge.util.VqcLog
+import com.videoqa.challenge.data.ContentRepository
+import com.videoqa.challenge.data.DebugConfiguration
+import com.videoqa.challenge.data.LaunchArguments
+import com.videoqa.challenge.data.PersistenceService
+import com.videoqa.challenge.util.VqcLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
