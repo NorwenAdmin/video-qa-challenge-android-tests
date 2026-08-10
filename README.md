@@ -1,34 +1,11 @@
 # Video QA Challenge (Android)
 
-The Android twin of the iOS Video QA Challenge app: a small, deterministic demo app used as the technical assignment for Senior Mobile Test Automation Engineer candidates. It simulates a simplified media product with a consent screen, a video content overview, content detail pages, and a video player with an explicit, inspectable state machine.
+A small, deterministic Android demo app that simulates a simplified media product with a consent screen, a video content overview, content detail pages, and a video player with an explicit, inspectable state machine.
 
 - App name: **Video QA Challenge**
 - Application id: `com.videoqa.challenge`
 - No login, no network, no external services. All content and video are bundled.
 - Kotlin, Jetpack Compose, Media3 (ExoPlayer).
-
-## Candidate assignment
-
-Write automated mobile tests for **one** platform of your choice, using **any technology and any programming language**:
-
-- **iOS**: https://github.com/tchumakina/video-qa-challenge-ios
-- **Android**: https://github.com/tchumakina/video-qa-challenge-android
-
-Build instructions are in each repository's README, and a prebuilt example binary is available in the `bin/` directory of each repository.
-
-Suggested minimum scope:
-
-1. Launch the application and handle the consent screen.
-2. Open `Amsterdam from above` and verify the correct detail page is displayed.
-3. Start video playback and verify the player reaches the `Playing` state.
-4. Add at least one additional risk-based scenario of your choice.
-
-What to deliver:
-
-- A **public GitHub/GitLab repository** with your tests.
-- A clear description of the solution and the **motivation** behind the chosen tools and approach.
-- Instructions for **how to run** the tests.
-- A **test execution report** stating on which environment the tests were executed (simulator/emulator, real device, device cloud, etc.) and **why that environment was chosen**.
 
 ## App overview
 
@@ -81,7 +58,7 @@ adb shell am start -n com.videoqa.challenge/.MainActivity
 
 ### Run the bundled smoke tests (optional)
 
-The project contains a small instrumented test class (`SmokeTest`) used to verify the build. It is not part of the candidate assignment. With an emulator or device connected:
+The project contains a small instrumented test class (`SmokeTest`) used to verify the build. With an emulator or device connected:
 
 ```bash
 ./gradlew connectedDebugAndroidTest
@@ -97,8 +74,6 @@ The release APK is unsigned by default. For BrowserStack, a debug APK works fine
 
 ## Testable flows
 
-The behaviour mirrors the iOS app exactly:
-
 - **Consent** appears on first launch only; any selection persists across launches until reset.
 - **Content overview** shows a loading indicator for a random 500–1500 ms, then always the same six items in the same order (first: `Amsterdam from above`, Travel, 02:30). At least one item is below the fold, so scrolling is required. Cards share the same visual structure; identify them by content id, never by list position.
 - **Content detail** shows title, category, description, published date, and a video preview with a play button. The content id is exposed through the `detail_title` element's state description.
@@ -108,7 +83,7 @@ The behaviour mirrors the iOS app exactly:
 
 ## Test identifiers (resource-id)
 
-All identifiers are Compose test tags exposed as `resource-id` to UiAutomator, Appium, and BrowserStack (via `testTagsAsResourceId`). They are identical to the iOS accessibility identifiers, so test suites can share locators across platforms. Find them with e.g. Appium's `accessibility id`-equivalent for Android: `id=consent_accept_button` (no package prefix).
+All identifiers are Compose test tags exposed as `resource-id` to UiAutomator, Appium, and BrowserStack (via `testTagsAsResourceId`). Find them with e.g. Appium's `accessibility id`-equivalent for Android: `id=consent_accept_button` (no package prefix).
 
 | Screen | Element | Identifier |
 |---|---|---|
@@ -134,7 +109,7 @@ Intentional exception (discussion point): the published date / duration metadata
 
 Debug options → `Reset consent`, `Clear playback progress`, `Restore default settings`, `Reset all app state`.
 
-### Intent extras (equivalent of iOS launch arguments)
+### Intent extras
 
 Extras override persisted debug settings for that run only (they are not written back to storage). Use `-S` to force-stop the app first so the extras apply to a fresh process:
 
@@ -163,7 +138,7 @@ adb uninstall com.videoqa.challenge        # remove the app
 
 ## Logging
 
-Consistent logs via logcat with one tag per category: `VQC.app`, `VQC.content`, `VQC.consent`, `VQC.player`, `VQC.debug`. Events mirror the iOS app (launch, consent selection, content load start/complete/fail, item opened, playback requested/buffering/started/paused/failed, retry, debug mode changes).
+Consistent logs via logcat with one tag per category: `VQC.app`, `VQC.content`, `VQC.consent`, `VQC.player`, `VQC.debug`. Logged events: launch, consent selection, content load start/complete/fail, item opened, playback requested/buffering/started/paused/failed, retry, debug mode changes.
 
 ```bash
 adb logcat -s VQC.app VQC.content VQC.consent VQC.player VQC.debug
@@ -202,7 +177,7 @@ app/src/main/java/com/videoqa/challenge/
 ├── viewmodel/              Content list and player state machines
 ├── ui/                     Compose screens (consent, overview, detail, player, debug)
 └── util/                   Logging
-app/src/main/assets/content.json      Bundled catalogue (identical to iOS)
-app/src/main/res/raw/sample_video.mp4 Bundled sample video (identical to iOS)
-app/src/androidTest/                  Build-verification smoke tests (not part of the assignment)
+app/src/main/assets/content.json      Bundled content catalogue
+app/src/main/res/raw/sample_video.mp4 Bundled sample video
+app/src/androidTest/                  Build-verification smoke tests
 ```
