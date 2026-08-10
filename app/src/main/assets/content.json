@@ -1,0 +1,56 @@
+[
+  {
+    "id": "amsterdam",
+    "title": "Amsterdam from above",
+    "category": "Travel",
+    "durationSeconds": 150,
+    "publishedDate": "2026-07-15",
+    "description": "Explore Amsterdam and its surroundings from a different perspective.",
+    "videoAsset": "sample_video.mp4"
+  },
+  {
+    "id": "newsroom",
+    "title": "Inside the newsroom",
+    "category": "News",
+    "durationSeconds": 245,
+    "publishedDate": "2026-07-12",
+    "description": "A look behind the scenes at how our editorial team prepares the daily news.",
+    "videoAsset": "sample_video.mp4"
+  },
+  {
+    "id": "morning",
+    "title": "Morning news update",
+    "category": "News",
+    "durationSeconds": 95,
+    "publishedDate": "2026-07-20",
+    "description": "The most important headlines to start your day, in under two minutes.",
+    "videoAsset": "sample_video.mp4"
+  },
+  {
+    "id": "technology",
+    "title": "Technology of tomorrow",
+    "category": "Technology",
+    "durationSeconds": 320,
+    "publishedDate": "2026-07-08",
+    "description": "How emerging technology is changing the way we live, work and travel.",
+    "videoAsset": "sample_video.mp4"
+  },
+  {
+    "id": "travel",
+    "title": "Weekend travel guide",
+    "category": "Travel",
+    "durationSeconds": 210,
+    "publishedDate": "2026-07-18",
+    "description": "Short trips and hidden gems for your next weekend away.",
+    "videoAsset": "sample_video.mp4"
+  },
+  {
+    "id": "interview",
+    "title": "Interview of the day",
+    "category": "Interviews",
+    "durationSeconds": 400,
+    "publishedDate": "2026-07-19",
+    "description": "An in-depth conversation with a guest who shaped this week's news.",
+    "videoAsset": "sample_video.mp4"
+  }
+]
