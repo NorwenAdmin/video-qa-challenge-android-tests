@@ -11,7 +11,9 @@ import com.videoqa.challenge.model.VideoMode
  *   adb shell am start -S -n com.videoqa.challenge/.MainActivity \
  *     --ez resetAllState true --es contentMode error --ei contentDelayMs 1000
  *
- * Extras override persisted debug settings for that application run only.
+ * Mode and delay extras override persisted debug settings for that application
+ * run only. The reset extras (resetAllState, resetConsent) permanently clear
+ * the corresponding persisted state.
  */
 data class LaunchArguments(
     val resetAllState: Boolean = false,

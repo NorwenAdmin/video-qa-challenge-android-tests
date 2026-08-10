@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
@@ -119,8 +120,13 @@ fun DetailScreen(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .testTag("detail_title")
-                        // Exposes the content id for automation, mirroring iOS.
-                        .semantics { stateDescription = item.id },
+                        // Exposes the content id for automation: stateDescription for
+                        // Compose tests, contentDescription for UiAutomator/Appium
+                        // (findable via the accessibility id strategy).
+                        .semantics {
+                            stateDescription = item.id
+                            contentDescription = item.id
+                        },
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -139,7 +145,7 @@ fun DetailScreen(
 
                 // Intentionally awkward accessibility structure: the metadata below
                 // is merged into a single unnamed element without a test tag. This is
-                // a deliberate, non-critical automation challenge for interview discussion.
+                // a deliberate, non-critical automation challenge.
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.semantics(mergeDescendants = true) {},

@@ -65,7 +65,10 @@ fun PlayerSection(container: AppContainer, item: ContentItem) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(220.dp)
-                .background(Color.Black),
+                .background(Color.Black)
+                // The tag lives on the Compose wrapper, not the AndroidView, so it
+                // is exposed as a resource-id to UiAutomator/Appium.
+                .testTag("video_player"),
         ) {
             AndroidView(
                 factory = { viewContext ->
@@ -74,9 +77,7 @@ fun PlayerSection(container: AppContainer, item: ContentItem) {
                         this.player = player.exoPlayer
                     }
                 },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .testTag("video_player"),
+                modifier = Modifier.fillMaxSize(),
             )
 
             if (player.state == PlayerState.BUFFERING) {

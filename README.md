@@ -20,19 +20,24 @@ A small, deterministic Android demo app that simulates a simplified media produc
 
 ## Requirements
 
-- JDK 17
-- Android SDK with platform 35 (Gradle downloads it automatically if licenses are accepted)
+- JDK 17 or newer
+- Android SDK with platform 35
 - Min SDK 26 (Android 8.0), target/compile SDK 35
 - Recommended emulator: Pixel 6, API 35
 - Portrait orientation only
 
-No Android Studio installation is required to build; the Gradle wrapper is included.
+No Android Studio installation is required to build; the Gradle wrapper is included. Gradle downloads the required SDK platform automatically, but it must be able to locate your SDK and the licenses must be accepted, otherwise the build fails with `SDK location not found`:
+
+```bash
+export ANDROID_HOME="$HOME/Library/Android/sdk"   # or set sdk.dir in local.properties
+sdkmanager --licenses                             # accept licenses once
+```
 
 ## Build instructions
 
 ### Prebuilt example binary
 
-A ready-to-use debug APK is committed at `bin/VideoQAChallenge-debug.apk`. You do not need the Android SDK to try the app:
+A ready-to-use debug APK is committed at `bin/VideoQAChallenge-debug.apk`. To try the app you only need `adb` (part of the Android platform-tools) — no build setup required:
 
 ```bash
 adb install -r bin/VideoQAChallenge-debug.apk
@@ -64,6 +69,8 @@ The project contains a small instrumented test class (`SmokeTest`) used to verif
 ./gradlew connectedDebugAndroidTest
 ```
 
+Note: the connected test run uninstalls the app from the device when it finishes. Reinstall it (`adb install -r ...`) before launching the app manually again.
+
 ### Build a release APK
 
 ```bash
@@ -76,14 +83,26 @@ The release APK is unsigned by default. For BrowserStack, a debug APK works fine
 
 - **Consent** appears on first launch only; any selection persists across launches until reset.
 - **Content overview** shows a loading indicator for a random 500–1500 ms, then always the same six items in the same order (first: `Amsterdam from above`, Travel, 02:30). At least one item is below the fold, so scrolling is required. Cards share the same visual structure; identify them by content id, never by list position.
-- **Content detail** shows title, category, description, published date, and a video preview with a play button. The content id is exposed through the `detail_title` element's state description.
-- **Video playback** transitions `Idle → Buffering → Playing` with deterministic simulated buffering (~800 ms normal, ~6 s in Long buffering mode). The state is always readable from `video_state_label`. Pausing saves the position; reopening the same content resumes from it.
-- **Empty / error states** for content ("No videos are available" / "Something went wrong") and video ("Video could not be played" with retry), all switchable from debug options.
+- **Content detail** shows title, category, description, published date, and a video preview with a play button. The content id is exposed on the `detail_title` element twice: as its state description (visible to Compose UI tests) and as its content description (visible to UiAutomator/Appium, findable with the `accessibility id` strategy).
+- **Video playback** transitions `Buffering → Playing` after the play button is tapped, with deterministic simulated buffering (~800 ms normal, ~6 s in Long buffering mode). The state is readable from `video_state_label`, which appears together with the player; the first observable state is `Buffering` (`Idle` exists in the state machine but is never shown, so do not assert on it). Pausing saves the position; reopening the same content resumes from it.
+- **Empty / error states** switchable from debug options. Content empty state: "No videos are available". Content error state: the heading "Something went wrong" is plain text without a test id; the element `content_error_message` contains "We could not load the videos". Video error: `video_error_message` contains "Video could not be played", with a retry button.
 - **Debug options** persist until changed or reset.
 
 ## Test identifiers (resource-id)
 
-All identifiers are Compose test tags exposed as `resource-id` to UiAutomator, Appium, and BrowserStack (via `testTagsAsResourceId`). Find them with e.g. Appium's `accessibility id`-equivalent for Android: `id=consent_accept_button` (no package prefix).
+All identifiers are Compose test tags exposed as `resource-id` to UiAutomator, Appium, and BrowserStack (via `testTagsAsResourceId`). They have **no package prefix**: the resource-id is `consent_accept_button`, not `com.videoqa.challenge:id/consent_accept_button`.
+
+**Important for Appium (UiAutomator2 driver):** by default the driver autocompletes bare ids with the package name, so `id=consent_accept_button` finds nothing. Either disable the autocompletion in your capabilities:
+
+```json
+"appium:disableIdLocatorAutocompletion": true
+```
+
+after which the plain `id` strategy works as documented (`$('id=consent_accept_button')` in WebdriverIO), or use a UiSelector locator, which is unaffected:
+
+```js
+$('android=new UiSelector().resourceId("consent_accept_button")')
+```
 
 | Screen | Element | Identifier |
 |---|---|---|
@@ -96,6 +115,7 @@ All identifiers are Compose test tags exposed as `resource-id` to UiAutomator, A
 | Overview | Empty state | `content_empty_state`, `content_empty_retry_button` |
 | Overview | Error state | `content_error_state`, `content_error_message`, `content_error_retry_button` |
 | Detail | Fields | `detail_title`, `detail_category`, `detail_description`, `detail_back_button`, `content_detail_screen` |
+| Detail | Preview play button | `video_play_button` (the same tag is reused by the player's play control) |
 | Player | Surface and controls | `video_player`, `video_play_button`, `video_pause_button`, `video_buffering_indicator`, `video_progress`, `video_current_position`, `video_duration`, `video_state_label`, `video_error_message`, `video_retry_button` |
 | Debug | Content modes | `debug_content_success`, `debug_content_empty`, `debug_content_error`, `debug_content_slow` |
 | Debug | Video modes | `debug_video_normal`, `debug_video_buffering`, `debug_video_error`, `debug_video_complete_quickly` |
@@ -111,16 +131,21 @@ Debug options → `Reset consent`, `Clear playback progress`, `Restore default s
 
 ### Intent extras
 
-Extras override persisted debug settings for that run only (they are not written back to storage). Use `-S` to force-stop the app first so the extras apply to a fresh process:
+| Extra | Type | Effect |
+|---|---|---|
+| `resetAllState` | boolean (`--ez`) | Permanently clears **all** persisted state at launch. |
+| `resetConsent` | boolean (`--ez`) | Permanently clears the persisted consent selection at launch. |
+| `contentMode` | string (`--es`) | One of `success`, `empty`, `error`, `slow`. |
+| `videoMode` | string (`--es`) | One of `normal`, `buffering`, `error`, `completeQuickly`. |
+| `contentDelayMs` | int (`--ei`) | Fixed content loading delay in ms. Replaces the delay of **any** content mode, including the 5 s `slow` delay. |
+| `videoBufferingMs` | int (`--ei`) | Fixed simulated buffering duration in ms. Replaces the mode default. |
+
+The mode and delay extras apply to that application run only and are not written back to storage. The reset extras are destructive: they delete the corresponding persisted state.
+
+Use `-S` to force-stop the app first so the extras apply to a fresh process. A complete, runnable example:
 
 ```bash
-adb shell am start -S -n com.videoqa.challenge/.MainActivity \
-  --ez resetAllState true          # clear all persisted state
-  --ez resetConsent true           # clear only the consent selection
-  --es contentMode success|empty|error|slow
-  --es videoMode normal|buffering|error|completeQuickly
-  --ei contentDelayMs 1000         # fixed content loading delay (replaces the random delay)
-  --ei videoBufferingMs 1500       # fixed buffering duration (replaces the mode default)
+adb shell am start -S -n com.videoqa.challenge/.MainActivity --ez resetAllState true --es contentMode error --ei contentDelayMs 1000
 ```
 
 With Appium (UiAutomator2 driver):
@@ -138,7 +163,13 @@ adb uninstall com.videoqa.challenge        # remove the app
 
 ## Logging
 
-Consistent logs via logcat with one tag per category: `VQC.app`, `VQC.content`, `VQC.consent`, `VQC.player`, `VQC.debug`. Logged events: launch, consent selection, content load start/complete/fail, item opened, playback requested/buffering/started/paused/failed, retry, debug mode changes.
+Consistent logs via logcat with one tag per category. Logged events:
+
+- `VQC.app` — app launch (with consent status), applied reset launch extras.
+- `VQC.consent` — consent selection.
+- `VQC.content` — content load started/completed/failed (failure at error level), content item opened.
+- `VQC.player` — playback requested, buffering entered, started, paused (with position), resumed, completed, failed (error level), retry selected.
+- `VQC.debug` — content/video mode changes, consent reset, playback progress cleared, all state reset.
 
 ```bash
 adb logcat -s VQC.app VQC.content VQC.consent VQC.player VQC.debug
@@ -162,7 +193,8 @@ Use the returned `app_url` (`bs://...`) as the `appium:app` capability. The app 
 - Buffering and playback errors are simulated deterministically in the app (a local file never buffers); this is intentional so tests are reliable.
 - Thumbnails are generated gradients, not real imagery.
 - Portrait only; no tablet layout, localization, offline downloads, PiP, or DRM.
-- If the video mode is changed in debug options while a detail page is already open, the new mode applies the next time a detail page is opened.
+- The debug video mode is captured when the player is created (the first play tap on a detail page). Changing the mode while a player is already active applies to the next player instance, not the current one.
+- Playback progress is cleared when the video completes. Resuming from a saved position in the final moments of the asset may complete almost immediately, after which the next playback starts from the beginning.
 - Process death resets in-app navigation to the overview (persisted state such as consent, debug modes, and playback progress is unaffected).
 
 ## Project structure
