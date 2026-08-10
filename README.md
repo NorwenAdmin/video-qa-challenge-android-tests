@@ -194,7 +194,7 @@ Use the returned `app_url` (`bs://...`) as the `appium:app` capability. The app 
 - Thumbnails are generated gradients, not real imagery.
 - Portrait only; no tablet layout, localization, offline downloads, PiP, or DRM.
 - The debug video mode is captured when the player is created (the first play tap on a detail page). Changing the mode while a player is already active applies to the next player instance, not the current one.
-- Playback progress is cleared when the video completes. Resuming from a saved position in the final moments of the asset may complete almost immediately, after which the next playback starts from the beginning.
+- A saved playback position within the last second of the asset is ignored; the next playback starts from the beginning. Progress is also cleared when the video completes.
 - Process death resets in-app navigation to the overview (persisted state such as consent, debug modes, and playback progress is unaffected).
 
 ## Project structure
