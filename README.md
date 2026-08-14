@@ -1,212 +1,170 @@
-# Video QA Challenge (Android)
+# Video QA Challenge (Android) — Test Automation Report
 
-A small, deterministic Android demo app that simulates a simplified media product with a consent screen, a video content overview, content detail pages, and a video player with an explicit, inspectable state machine.
+## Motivation
 
-- App name: **Video QA Challenge**
-- Application id: `com.videoqa.challenge`
-- No login, no network, no external services. All content and video are bundled.
-- Kotlin, Jetpack Compose, Media3 (ExoPlayer).
+**Platform:** Android over iOS — more hands-on experience with the Android
+toolchain, faster/more reliable environment setup.
 
-## App overview
+**Framework:** Espresso / Compose UI Test — preferred tool, natural fit for a
+Jetpack Compose app.
 
-| Screen | Purpose |
-|---|---|
-| Consent | Shown on first launch only. Accept all, reject optional, or manage preferences. |
-| Preferences | Analytics and personalised-content toggles, saved locally. |
-| Content overview | Deterministic list of six videos with loading, empty, and error states. |
-| Content detail | Title, category, description, published date, and video preview with play button. |
-| Video player | Custom ExoPlayer UI with play/pause/resume, progress, and a testable state label (`Buffering`, `Playing`, `Paused`, `Error`, `Completed`). |
-| Debug options | Gear icon on the overview. Switches content/video response modes and resets app state. |
+**Pattern:** Robot Pattern — my default for mobile testing, more practical
+than Page Object for this kind of work.
 
-## Requirements
+**Locator strategy:** testTag-based matching. My default habit is usually
+semantics-first (`hasText`/`hasContentDescription`), since in my past experience
+team conventions generally discouraged testTag. Here I switched after inspecting
+the source: the app explicitly exposes testTags as resource-ids
+(`testTagsAsResourceId = true` in `VideoQAApp.kt`), intentional for UiAutomator/
+Appium. That's the API this app was built to be tested with, so I matched the
+approach it was designed for instead of forcing my usual habit.
 
-- JDK 17–24 (the bundled Gradle 8.14.2 wrapper does not run on newer JDKs)
-- Android SDK with platform 35
-- Min SDK 26 (Android 8.0), target/compile SDK 35
-- Recommended emulator: Pixel 6, API 35
-- Portrait orientation only
+---
 
-No Android Studio installation is required to build; the Gradle wrapper is included. Gradle downloads the required SDK platform automatically, but two things must be in place first:
+## How to run
 
-1. Gradle must be able to locate your SDK, otherwise the build fails with `SDK location not found`. Point `ANDROID_HOME` at the SDK or set `sdk.dir` in `local.properties`:
+1. Clone https://github.com/tchumakina/video-qa-challenge-android
+2. Ensure JDK 17–21 is used (not 25) — set via `gradle.properties`:
+   `org.gradle.java.home=<path-to-jdk17-or-21>`
+3. `export ANDROID_HOME=<your SDK path>`
+4. `./gradlew connectedAndroidTest`
+   (runs on a connected emulator/device — Pixel 6 / API 35 recommended)
 
-```bash
-export ANDROID_HOME="$HOME/Library/Android/sdk"   # macOS default
-export ANDROID_HOME="$HOME/Android/Sdk"           # Linux default
-```
+---
 
-2. The SDK licenses must be accepted, otherwise the build fails with a licence error listing the unaccepted packages. Accept them once with `sdkmanager` (part of the `cmdline-tools` SDK package — install it via Android Studio's SDK Manager or from [developer.android.com](https://developer.android.com/studio#command-line-tools-only) if missing):
+## Test execution report
 
-```bash
-"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
-```
+**Environment:** Local Android emulator (Pixel 6, API 35, per AUT README).
 
-## Build instructions
+**Why:** No physical device on hand; for a single-run assignment, a device
+cloud (BrowserStack App Automate — which does support native Espresso suites
+via its own API, separate from the Appium flow documented in the AUT README)
+adds upload/setup overhead without real benefit for a one-off run. Emulator
+gives faster iteration and full control over launch args/animations.
 
-### Prebuilt example binary
+**Execution time:** Full suite (`./gradlew connectedAndroidTest`) completes in 56s.
 
-A ready-to-use debug APK is committed at `bin/VideoQAChallenge-debug.apk`. To try the app you only need `adb` (part of the Android platform-tools) — no build setup required:
+**Time tracked:**
+- Planning and architecture (source reading, decisions, test design): ~1–2h
+- Writing the suite and fixing tests against the real device: ~1h
+- Report refinement (following session): ~30min–1h
 
-```bash
-adb install -r bin/VideoQAChallenge-debug.apk
-adb shell am start -n com.videoqa.challenge/.MainActivity
-```
-
-The same APK can be used directly as the `app` capability for Appium or uploaded to a device cloud.
-
-### Build a debug APK
-
-```bash
-./gradlew assembleDebug
-```
-
-Output: `app/build/outputs/apk/debug/app-debug.apk`
-
-### Install and launch on a device or emulator
-
-```bash
-adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb shell am start -n com.videoqa.challenge/.MainActivity
-```
-
-### Build a release APK
-
-```bash
-./gradlew assembleRelease
-```
-
-The release APK is unsigned by default. For BrowserStack, a debug APK works fine; if you need a signed release build, configure a signing config or sign with `apksigner` using your own keystore. No keystores are included in this repository.
-
-## Testable flows
-
-- **Consent** appears on first launch only; any selection persists across launches until reset.
-- **Content overview** shows a loading indicator for a random 500–1500 ms, then always the same six items in the same order (first: `Amsterdam from above`, Travel, 02:30). At least one item is below the fold, so scrolling is required. Cards share the same visual structure; identify them by content id, never by list position.
-- **Content detail** shows title, category, description, published date, and a video preview with a play button. The content id is exposed on the `detail_title` element twice: as its state description (visible to Compose UI tests) and as its content description (visible to UiAutomator/Appium, findable with the `accessibility id` strategy).
-- **Video playback** transitions `Buffering → Playing` after the play button is tapped, with deterministic simulated buffering (~800 ms normal, ~6 s in Long buffering mode). The state is readable from `video_state_label`, which appears together with the player; the first observable state is `Buffering` (`Idle` exists in the state machine but is never shown, so do not assert on it). Pausing saves the position; reopening the same content resumes from it.
-- **Empty / error states** switchable from debug options. Content empty state: "No videos are available". Content error state: the heading "Something went wrong" is plain text without a test id; the element `content_error_message` contains "We could not load the videos". Video error: `video_error_message` contains "Video could not be played", with a retry button.
-- **Debug options** persist until changed or reset.
-
-## Test identifiers (resource-id)
-
-All identifiers are Compose test tags exposed as `resource-id` to UiAutomator, Appium, and BrowserStack (via `testTagsAsResourceId`). They have **no package prefix**: the resource-id is `consent_accept_button`, not `com.videoqa.challenge:id/consent_accept_button`.
-
-**Important for Appium (UiAutomator2 driver):** by default the driver autocompletes bare ids with the package name, so `id=consent_accept_button` finds nothing. Either disable the autocompletion in your capabilities:
-
-```json
-"appium:disableIdLocatorAutocompletion": true
-```
-
-after which the plain `id` strategy works as documented (`$('id=consent_accept_button')` in WebdriverIO), or use a UiSelector locator, which is unaffected:
-
-```js
-$('android=new UiSelector().resourceId("consent_accept_button")')
-```
-
-| Screen | Element | Identifier |
-|---|---|---|
-| Consent | Screen container | `consent_screen` |
-| Consent | Accept all / Reject optional / Manage preferences | `consent_accept_button`, `consent_reject_button`, `consent_manage_preferences_button` |
-| Preferences | Screen, toggles, save | `preferences_screen`, `analytics_toggle`, `personalisation_toggle`, `preferences_save_button` |
-| Overview | Screen, list, loading | `content_overview_screen`, `content_list`, `content_loading_indicator` |
-| Overview | Toolbar buttons | `content_refresh_button`, `debug_options_button` |
-| Overview | Card / title per item | `content_item_<contentId>`, `content_title_<contentId>` (e.g. `content_item_amsterdam`) |
-| Overview | Empty state | `content_empty_state`, `content_empty_retry_button` |
-| Overview | Error state | `content_error_state`, `content_error_message`, `content_error_retry_button` |
-| Detail | Fields | `detail_title`, `detail_category`, `detail_description`, `detail_back_button`, `content_detail_screen` |
-| Detail | Preview play button | `video_play_button` (the same tag is reused by the player's play control) |
-| Player | Surface and controls | `video_player`, `video_play_button`, `video_pause_button`, `video_buffering_indicator`, `video_progress`, `video_current_position`, `video_duration`, `video_state_label`, `video_error_message`, `video_retry_button` |
-| Debug | Content modes | `debug_content_success`, `debug_content_empty`, `debug_content_error`, `debug_content_slow` |
-| Debug | Video modes | `debug_video_normal`, `debug_video_buffering`, `debug_video_error`, `debug_video_complete_quickly` |
-| Debug | State controls | `debug_reset_consent`, `debug_clear_progress`, `debug_reset_all`, `debug_restore_defaults`, `debug_done_button`, `debug_screen` |
-
-Intentional exception (discussion point): the published date / duration metadata row on the detail screen is a single merged element without an identifier. It is non-critical and not needed for any mandatory flow.
-
-## State reset and launch configuration
-
-### In-app
-
-Debug options → `Reset consent`, `Clear playback progress`, `Restore default settings`, `Reset all app state`.
-
-### Intent extras
-
-| Extra | Type | Effect |
-|---|---|---|
-| `resetAllState` | boolean (`--ez`) | Permanently clears **all** persisted state at launch. |
-| `resetConsent` | boolean (`--ez`) | Permanently clears the persisted consent selection at launch. |
-| `contentMode` | string (`--es`) | One of `success`, `empty`, `error`, `slow`. |
-| `videoMode` | string (`--es`) | One of `normal`, `buffering`, `error`, `completeQuickly`. |
-| `contentDelayMs` | int (`--ei`) | Fixed content loading delay in ms. Replaces the delay of **any** content mode, including the 5 s `slow` delay. |
-| `videoBufferingMs` | int (`--ei`) | Fixed simulated buffering duration in ms. Replaces the mode default. |
-
-The mode and delay extras apply to that application run only and are not written back to storage. The reset extras are destructive: they delete the corresponding persisted state.
-
-Use `-S` to force-stop the app first so the extras apply to a fresh process. A complete, runnable example:
-
-```bash
-adb shell am start -S -n com.videoqa.challenge/.MainActivity --ez resetAllState true --es contentMode error --ei contentDelayMs 1000
-```
-
-With Appium (UiAutomator2 driver):
-
-```json
-"appium:optionalIntentArguments": "--ez resetAllState true --es videoMode buffering"
-```
-
-### Removing app data
-
-```bash
-adb shell pm clear com.videoqa.challenge   # clear app data (consent shows again)
-adb uninstall com.videoqa.challenge        # remove the app
-```
-
-## Logging
-
-Consistent logs via logcat with one tag per category. Logged events:
-
-- `VQC.app` — app launch (with consent status), applied reset launch extras.
-- `VQC.consent` — consent selection.
-- `VQC.content` — content load started/completed/failed (failure at error level), content item opened.
-- `VQC.player` — playback requested, buffering entered, started, paused (with position), resumed, completed, failed (error level), retry selected.
-- `VQC.debug` — content/video mode changes, consent reset, playback progress cleared, all state reset.
-
-```bash
-adb logcat -s VQC.app VQC.content VQC.consent VQC.player VQC.debug
-```
-
-## BrowserStack
-
-Upload the debug APK to App Automate (replace the credential placeholders; never commit real credentials):
-
-```bash
-curl -u "YOUR_USERNAME:YOUR_ACCESS_KEY" \
-  -X POST "https://api-cloud.browserstack.com/app-automate/upload" \
-  -F "file=@app/build/outputs/apk/debug/app-debug.apk"
-```
-
-Use the returned `app_url` (`bs://...`) as the `appium:app` capability. The app has no login and no network dependency.
-
-## Known limitations
-
-- All six content items share one bundled 30-second sample video; the durations shown in the list are catalogue metadata, not the real asset length. The player shows the real asset duration (00:30).
-- Buffering and playback errors are simulated deterministically in the app (a local file never buffers); this is intentional so tests are reliable.
-- Thumbnails are generated gradients, not real imagery.
-- Portrait only; no tablet layout, localization, offline downloads, PiP, or DRM.
-- The debug video mode is captured when the player is created (the first play tap on a detail page). Changing the mode while a player is already active applies to the next player instance, not the current one.
-- A saved playback position within the last second of the asset is ignored; the next playback starts from the beginning. Progress is also cleared when the video completes.
-- Process death resets in-app navigation to the overview (persisted state such as consent, debug modes, and playback progress is unaffected).
+---
 
 ## Project structure
 
 ```text
-bin/                                  Prebuilt example debug APK
-app/src/main/java/com/videoqa/challenge/
-├── MainActivity.kt         Entry point, reads intent extras
-├── AppContainer.kt         Root state and shared services
-├── model/                  Content item, player state, debug mode enums
-├── data/                   Persistence, repository, debug configuration, launch arguments
-├── viewmodel/              Content list and player state machines
-├── ui/                     Compose screens (consent, overview, detail, player, debug)
-└── util/                   Logging
-app/src/main/assets/content.json      Bundled content catalogue
-app/src/main/res/raw/sample_video.mp4 Bundled sample video
+app/src/androidTest/java/com/videoqa/challenge/
+├── base/                    Shared test infrastructure
+│   ├── BaseComposeTest.kt   ComposeTestRule + launchApp() with intent extras
+│   ├── BaseRobot.kt         click() with built-in wait-until-clickable
+│   └── BaseVerification.kt  assertExists() with built-in wait-until-exists
+├── robots/                  One Robot + Verification pair per screen
+│   ├── ConsentRobot.kt
+│   ├── OverviewRobot.kt
+│   └── DetailRobot.kt       Covers detail metadata and the player
+│                            (PlayerSection renders inline within DetailScreen)
+├── util/                    Shared test utilities
+│   ├── ComposeSyncUtils.kt  waitUntilExists / waitUntilClickable / waitUntilState
+│   ├── TestTimeouts.kt      Named, justified timeout constants
+│   └── TestFixtures.kt      Video content used across tests
+└── tests/
+    ├── HappyPathTest.kt     Mandatory flow + full player state machine
+    └── RiskScenariosTest.kt Error, buffering, completion, and negative-path scenarios
+
+TESTING_REPORT.md            Motivation, execution report, AI usage note, test plan
 ```
+
+---
+
+## AI usage note
+
+**Tools used:** Claude, throughout planning and implementation. Claude Code
+for running the final suite and formatting the output.
+
+**How:** Used as a copilot for architecture decisions, code review, and
+debugging stack traces — not as an autonomous agent generating the suite
+end-to-end. I supplied the actual AUT source files and live-device output at
+each step; decisions were made against what the code and the running app
+actually showed, not assumptions.
+
+**Representative prompts / examples:**
+
+1. *"Сначало нужно дождпться окончания буфера а потом проверять"* ("The
+   buffering has to finish before we check") — caught a race condition in a
+   draft error-state test that asserted on error UI immediately after tapping
+   play, without waiting for the Buffering → Error transition first.
+
+2. *"Я не вижу смысла в val player"* ("I don't see the point of `val player`")
+   — pushed back on an unnamed fluent chain that silently switched Robot types
+   mid-test (DetailRobot → PlayerRobot after `.startPlayback()`). Led to
+   merging PlayerRobot into DetailRobot entirely, since both represent the
+   same physical screen in this app.
+
+3. *"Нет я бы добавил желательно сделать другой механизм так как три секунды
+   это просто простой"* ("I'd flag that a different mechanism is needed — 3
+   seconds is just dead time") — after finding the `completeQuickly` mode
+   still requires ~3s of real wait, rejected simply padding the test timeout.
+   Reframed it as a product-level finding: this debug mode doesn't behave
+   consistently with Error/Buffering, which render state instantly.
+
+4. *"Я бы сначала спросил а потом фиксить, вдруг они специально оставили"*
+   ("I'd ask first before fixing — it might be intentional") — when discussing
+   the untagged metadata row, rejected the idea of silently patching the AUT
+   even as a "senior fix," in favor of raising it with the team first — same
+   principle later confirmed by the source comment marking it intentional.
+
+**How I evaluated the output:** Rejected/corrected AI suggestions several
+times — caught a case where a proposed fix increased a timeout without
+addressing the root cause (missing scroll-to-node before querying a
+not-yet-composed item); insisted on human-verified device behavior over AI's
+initial guesses about internal timing (buffering duration, completion mode).
+
+**Additionally:** Used Claude Code to run the final test suite and format
+(beautify) the execution output for the test execution report.
+
+---
+
+## Test Plan & Next Steps
+
+**Covered:**
+- Mandatory flow (consent → overview → detail → playback → Playing)
+- Full player state machine: Buffering, Playing, Paused, Error, Completed
+- Navigation round-trip: detail → back → open a different video
+- Consent reject-optional path
+- Play button disabled during buffering (`enabled=` condition from source)
+- Content-level error state on Overview
+- Overview video card content (title, category, published date) via merged
+  semantics matching
+
+**Next scenarios, in priority order:**
+1. Content empty state (`contentMode=empty`) — mirrors the error-state test,
+   quick to add given existing infrastructure
+2. Playback resume from saved position (README: pause saves position, reopen
+   resumes) — meaningful behavior not yet covered
+3. Content slow-loading state (`contentMode=slow`) — lower priority, same UI
+   pattern as success, only differs by delay
+
+**Risks / open questions:**
+- Metadata row on Detail (date/duration) intentionally has no testTag (source
+  comment); matched via merged-node text search rather than modifying the AUT.
+- User-facing strings (e.g. consent copy) are hardcoded in composables rather
+  than `strings.xml` — no shared source of truth between app and test matchers.
+  Recommend moving to resources; kept substring matching to reduce fragility.
+- `completeQuickly` video mode still requires ~3s of real wait (seeks near end
+  of asset rather than skipping playback). Suggest a true instant-completion
+  debug state for consistency with Error/Buffering, which render their state
+  without waiting on real player mechanics.
+- Preferences (analytics/personalisation) toggle values have no UI-visible
+  confirmation path — expected, since no visual change should follow from a
+  privacy choice. Recommend keeping UI coverage to a screenshot test on the
+  save/transition flow, and covering the actual persistence logic with unit
+  tests owned by the dev team rather than testing storage through the UI layer.
+- Test locators (testTags like `"video_play_button"`, `"content_item_${id}"`)
+  are hardcoded as string literals on both the app side (`Modifier.testTag(...)`)
+  and the test side (`hasTestTag(...)`), with no shared source of truth. A
+  rename on either side breaks the other silently at runtime, not at compile
+  time. Would suggest the dev team maintain testTag values in a shared
+  constants file/object (similar to how string resources centralize UI copy),
+  so both app and test code reference the same source and a rename becomes a
+  compile-time break instead of a runtime test failure.
