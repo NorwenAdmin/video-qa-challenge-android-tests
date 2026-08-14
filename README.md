@@ -23,7 +23,7 @@ approach it was designed for instead of forcing my usual habit.
 
 ## How to run
 
-1. Clone https://github.com/tchumakina/video-qa-challenge-android
+1. Clone https://github.com/NorwenAdmin/video-qa-challenge-android-tests
 2. Ensure JDK 17–21 is used (not 25) — set via `gradle.properties`:
    `org.gradle.java.home=<path-to-jdk17-or-21>`
 3. `export ANDROID_HOME=<your SDK path>`
